@@ -1,4 +1,4 @@
-# ⚡ Jolt
+# ⚡ Jolt-Notes
 
 **A note-taking app that respects your CPU, your RAM, and your intelligence.**
 **Born of spite, benchmarks, and an unflinching refusal to tolerate web-tech mediocrity.**
