@@ -1,1 +1,11 @@
-TRADEMARK.md
+# Temp
+/.cargo
+/helper
+package.json
+/public
+/src
+Cargo.*
+
+/target
+/node_modules
+/testing
