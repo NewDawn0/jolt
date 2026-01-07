@@ -24,7 +24,7 @@ These objectives are **mutually incompatible**.
 
 ---
 
-## Why do you use so much [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)?
+## Why do you despise [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) so much?
 
 I do not hate it. I **detest using JavaScript for tasks it was never designed to handle**.
 
@@ -162,8 +162,8 @@ People who think:
 
 If a suggestion:
 
-* Adds **complexity**
-* Adds **dependencies**
+* Adds unncessesary **complexity**
+* Adds unncessesary **dependencies**
 * Trades **performance for convenience**
 
 The answer is **probably no**.
