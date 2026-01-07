@@ -36,18 +36,6 @@ If your app stutters, hoovers RAM like a vacuum cleaner, or requires a small dat
 
 ---
 
-## Performance
-
-Modern note-taking apps get slower as you take more notes. **Exponentially slower.**
-
-This is not a mystery. It is the feature of your technology choices:
-
-* Building long-lived, state-heavy apps on frameworks designed for form validation
-* Layering abstraction upon abstraction and calling it "maintainable"
-* Optimizing for developer convenience and billing the user in CPU cycles
-
----
-
 ## Jolt Exists Because
 
 * Notes apps should **not decay over time**
