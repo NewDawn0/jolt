@@ -1,0 +1,24 @@
+{
+  "name": "jolt-notes",
+  "version": "1.0.0",
+  "description": "An app for taking notes",
+  "main": "main.js",
+  "scripts": {
+    "build": "wasm-pack build --target web && (rm -rf ./public/pkg; mv pkg ./public)",
+    "serve": "npx serve ./public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NewDawn0/jolt.git"
+  },
+  "keywords": [
+    "Notes",
+    "Note taking"
+  ],
+  "author": "NewDawn0",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/NewDawn0/jolt/issues"
+  },
+  "homepage": "https://github.com/NewDawn0/jolt#readme"
+}
