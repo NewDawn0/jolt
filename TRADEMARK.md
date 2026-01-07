@@ -1,6 +1,6 @@
-# Trademark Policy for send-notes
+# Trademark Policy for Jolt-Notes
 
-The goal of this policy is to ensure that users know the difference between the official **send-notes** service (hosted by the creator) and third-party versions of the software.
+The goal of this policy is to ensure that users know the difference between the official **Jend-notes** service (hosted by the creator) and third-party versions of the software.
 
 ### 1. Ownership
 The name **Jolt-Notes** and any official logos associated with the project are trademarks owned by NewDawn0.
