@@ -5,8 +5,9 @@
   "main": "main.js",
   "scripts": {
     "build": "wasm-pack build --target web && (rm -rf ./public/pkg; mv pkg ./public)",
+    "clean": "cargo clean && rm -rf pkg",
     "serve": "npx serve ./public",
-    "watch-build": "cargo watch -i pkg -i public -i target -w src -s 'wasm-pack build --target web'",
+    "watch-build": "cargo watch -i pkg -i public -x build -s 'npm run build'",
     "watch": "run-p watch-build serve"
   },
   "repository": {
