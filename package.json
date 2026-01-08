@@ -5,7 +5,9 @@
   "main": "main.js",
   "scripts": {
     "build": "wasm-pack build --target web && (rm -rf ./public/pkg; mv pkg ./public)",
-    "serve": "npx serve ./public"
+    "serve": "npx serve ./public",
+    "watch-build": "cargo watch -i pkg -i public -i target -w src -s 'wasm-pack build --target web'",
+    "watch": "run-p watch-build serve"
   },
   "repository": {
     "type": "git",
@@ -20,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/NewDawn0/jolt/issues"
   },
-  "homepage": "https://github.com/NewDawn0/jolt#readme"
+  "homepage": "https://github.com/NewDawn0/jolt#readme",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
 }
