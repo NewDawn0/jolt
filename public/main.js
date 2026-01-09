@@ -1,7 +1,7 @@
-import init from './pkg/jolt.js';
+import init, { GlRender } from './pkg/jolt.js';
 
 const load = async () => {
-  await init();
+  await init().catch(console.error);
   console.info("Wasm loaded");
 }
 load();

@@ -25,10 +25,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "helper"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "jolt"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
+ "helper",
  "js-sys",
  "wasm-bindgen",
  "web-sys",

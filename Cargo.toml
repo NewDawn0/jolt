@@ -11,6 +11,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 console_error_panic_hook = "0.1.7"
+helper = { path = "./helper" }
 wasm-bindgen = "0.2.106"
 js-sys = "0.3.83"
 web-sys = { version = "0.3.83", features = [
