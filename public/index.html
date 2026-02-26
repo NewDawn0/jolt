@@ -17,8 +17,32 @@
   </noscript>
   <!-- Load the wasm main -->
   <script type="module">
-    import init from './pkg/jolt.js';
-    await init().catch(console.error);
+    import init, {Canvas} from './pkg/jolt.js';
+    const setup = async () => {
+      await init().catch(console.error);
+      const ctx = {
+        canvas: new Canvas(),
+        fpsEl: document.getElementById("overlay-fps"),
+        lastTime: performance.now(),
+      }
+      // Add handlers
+      window.addEventListener('resize', () => {
+        ctx.canvas.handle_resize();
+      });
+      // Start rendering
+      window.requestAnimationFrame(() => renderLoop(ctx));
+    }
+
+    const renderLoop = (ctx) => {
+      const {canvas, fpsEl, lastTime} = ctx;
+      const now = performance.now();
+      const deltaTime = now - lastTime;
+      ctx.lastTime = now;
+      const fps = deltaTime > 0 ? 1000 / deltaTime : 0;
+      fpsEl.innerText = Math.round(fps);
+      window.requestAnimationFrame(() => renderLoop(ctx));
+    }
+    await setup();
   </script>
   <!-- Main components -->
   <canvas id="Canvas"></canvas>

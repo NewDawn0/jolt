@@ -9,12 +9,19 @@ use web_sys::{
 
 /// WebGL2 rendering pipeline.
 pub struct Pipeline {
+    /// WebGL2 rendering context.
     ctx: GL,
+    /// Compiled shader program.
     program: GLProgram,
+    /// Vertex array object.
     vao: GLVAO,
+    /// Vertex buffer object.
     vbo: WebGlBuffer,
+    /// Viewport uniform location.
     u_viewport: Option<WebGlUniformLocation>,
+    /// Position uniform location.
     u_position: Option<WebGlUniformLocation>,
+    /// Canvas element.
     canvas: HtmlCanvasElement,
 }
 
@@ -45,7 +52,7 @@ impl Pipeline {
         })
     }
 
-    // Handles resizing of the viewport
+    /// Resizes canvas and updates viewport uniform.
     pub fn resize(&mut self, size: Vec2) {
         self.canvas.set_width(size.x as u32);
         self.canvas.set_height(size.y as u32);
@@ -120,6 +127,7 @@ impl Pipeline {
         self.ctx.draw_arrays(GL::TRIANGLE_STRIP, 0, 4);
     }
 
+    /// Compiles a shader from source.
     fn compile_shader(&self, src: &str, shader_t: u32) -> WasmResult<GLShader> {
         let shader = self
             .ctx

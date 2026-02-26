@@ -1,6 +1,7 @@
 //! Jolt - WASM note-taking web app.
 
 pub mod canvas;
+mod chunk;
 mod render;
 mod types;
 

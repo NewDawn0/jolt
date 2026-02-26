@@ -16,7 +16,7 @@ macro_rules! shader_src {
 }
 
 /// WebGL2 canvas wrapper.
-// #[wasm_bindgen]
+#[wasm_bindgen]
 pub struct Canvas {
     position: Vec2,
     pipeline: Pipeline,
@@ -24,7 +24,7 @@ pub struct Canvas {
     window: Window,
 }
 
-// #[wasm_bindgen]
+#[wasm_bindgen]
 impl Canvas {
     /// Creates new canvas
     // #[wasm_bindgen(constructor)]
@@ -53,7 +53,7 @@ impl Canvas {
             viewport,
             window,
         };
-        // Set width
+        // Handle initial resize
         out.handle_resize()?;
         Ok(out)
     }
