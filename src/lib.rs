@@ -1,9 +1,10 @@
 //! Jolt - WASM note-taking web app.
 
-mod canvas;
+pub mod canvas;
 mod render;
 mod types;
-use crate::{canvas::Canvas, types::WasmResult};
+
+use crate::types::WasmResult;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -39,7 +40,5 @@ macro_rules! console_info {
 #[wasm_bindgen(start)]
 pub fn start() -> WasmResult<()> {
     console_error_panic_hook::set_once();
-    let mut canvas = Canvas::new()?;
-    canvas.start_render();
     Ok(())
 }

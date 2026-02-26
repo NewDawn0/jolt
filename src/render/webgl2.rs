@@ -1,10 +1,10 @@
 //! WebGL2 pipeline - context, shaders, VAO.
 
-use crate::types::WasmResult;
+use crate::types::{Vec2, WasmResult};
 use wasm_bindgen::JsCast;
 use web_sys::{
-    HtmlCanvasElement, WebGl2RenderingContext as GL, WebGlProgram as GLProgram,
-    WebGlShader as GLShader, WebGlVertexArrayObject as GLVAO, window,
+    HtmlCanvasElement, WebGl2RenderingContext as GL, WebGlBuffer, WebGlProgram as GLProgram,
+    WebGlShader as GLShader, WebGlUniformLocation, WebGlVertexArrayObject as GLVAO, window,
 };
 
 /// WebGL2 rendering pipeline.
@@ -12,17 +12,16 @@ pub struct Pipeline {
     ctx: GL,
     program: GLProgram,
     vao: GLVAO,
+    vbo: WebGlBuffer,
+    u_viewport: Option<WebGlUniformLocation>,
+    u_position: Option<WebGlUniformLocation>,
+    canvas: HtmlCanvasElement,
 }
+
 impl Pipeline {
     /// Creates pipeline from canvas element.
-    pub fn new(canvas_id: &str) -> WasmResult<Self> {
-        let ctx = window()
-            .expect("No window found")
-            .document()
-            .expect("No document found")
-            .get_element_by_id(canvas_id)
-            .expect(&format!("Canvas elem `{}` not found", canvas_id))
-            .dyn_into::<HtmlCanvasElement>()?
+    pub fn new(canvas: HtmlCanvasElement) -> WasmResult<Self> {
+        let ctx = canvas
             .get_context("webgl2")?
             .expect("WebGl2 not supported")
             .dyn_into::<GL>()?;
@@ -32,8 +31,29 @@ impl Pipeline {
         let vao = ctx
             .create_vertex_array()
             .ok_or("Failed to create VAO for rendering")?;
-        Ok(Self { ctx, program, vao })
+        let vbo = ctx
+            .create_buffer()
+            .ok_or("Failed to create VBO for rendering")?;
+        Ok(Self {
+            canvas,
+            ctx,
+            program,
+            u_position: None,
+            u_viewport: None,
+            vao,
+            vbo,
+        })
     }
+
+    // Handles resizing of the viewport
+    pub fn resize(&mut self, size: Vec2) {
+        self.canvas.set_width(size.x as u32);
+        self.canvas.set_height(size.y as u32);
+        if let Some(loc) = &self.u_viewport {
+            self.ctx.uniform2f(Some(loc), size.x, size.y);
+        }
+    }
+
     /// Compiles and attaches shaders, links program, configures VAO.
     pub fn add_shaders(&mut self, frag_src: &str, vert_src: &str) -> WasmResult<()> {
         let frag = self.compile_shader(frag_src, GL::FRAGMENT_SHADER)?;
@@ -54,13 +74,52 @@ impl Pipeline {
                 .into());
         }
         self.ctx.bind_vertex_array(Some(&self.vao));
+
+        // Create full-screen quad vertices (triangle strip)
+        let vertices: [f32; 8] = [
+            -1.0, -1.0, // bottom left
+            1.0, -1.0, // bottom right
+            -1.0, 1.0, // top left
+            1.0, 1.0, // top right
+        ];
+
+        self.ctx.bind_buffer(GL::ARRAY_BUFFER, Some(&self.vbo));
+        unsafe {
+            let vertices_slice = std::slice::from_raw_parts(vertices.as_ptr(), vertices.len());
+            self.ctx.buffer_data_with_array_buffer_view(
+                GL::ARRAY_BUFFER,
+                &js_sys::Float32Array::view(vertices_slice),
+                GL::STATIC_DRAW,
+            );
+        }
+
         self.ctx.enable_vertex_attrib_array(0);
         self.ctx
             .vertex_attrib_pointer_with_i32(0, 2, GL::FLOAT, false, 0, 0);
+        self.ctx.bind_buffer(GL::ARRAY_BUFFER, None);
         self.ctx.bind_vertex_array(None);
         self.ctx.use_program(Some(&self.program));
+
+        self.u_viewport = self.ctx.get_uniform_location(&self.program, "u_viewport");
+        self.u_position = self.ctx.get_uniform_location(&self.program, "u_position");
+
         Ok(())
     }
+
+    /// Sets the position uniform (x, y offset)
+    pub fn set_position(&mut self, position: Vec2) {
+        if let Some(loc) = &self.u_position {
+            self.ctx.uniform2f(Some(loc), position.x, position.y);
+        }
+    }
+
+    /// Renders a frame
+    pub fn render(&self) {
+        self.ctx.clear_color(0.1, 0.1, 0.1, 1.0);
+        self.ctx.clear(GL::COLOR_BUFFER_BIT);
+        self.ctx.draw_arrays(GL::TRIANGLE_STRIP, 0, 4);
+    }
+
     fn compile_shader(&self, src: &str, shader_t: u32) -> WasmResult<GLShader> {
         let shader = self
             .ctx

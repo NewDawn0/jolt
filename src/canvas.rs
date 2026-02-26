@@ -1,15 +1,12 @@
 //! Canvas management - WebGL2 init and render loop.
 
-use std::sync::mpsc::{self, Sender};
-
-use crate::{console_info, render::webgl2::Pipeline, types::WasmResult};
-use wasm_bindgen_futures::spawn_local;
-
-/// WebGL2 canvas wrapper.
-pub struct Canvas {
-    pipeline: Pipeline,
-    tx: Option<Sender<()>>,
-}
+use crate::{
+    console_info,
+    render::webgl2::Pipeline,
+    types::{Vec2, WasmResult},
+};
+use wasm_bindgen::prelude::*;
+use web_sys::{HtmlCanvasElement, Window, window};
 
 /// Embeds shader source at compile time.
 macro_rules! shader_src {
@@ -18,36 +15,62 @@ macro_rules! shader_src {
     };
 }
 
+/// WebGL2 canvas wrapper.
+// #[wasm_bindgen]
+pub struct Canvas {
+    position: Vec2,
+    pipeline: Pipeline,
+    viewport: Vec2,
+    window: Window,
+}
+
+// #[wasm_bindgen]
 impl Canvas {
     /// Creates new canvas
+    // #[wasm_bindgen(constructor)]
     pub fn new() -> WasmResult<Self> {
-        let mut pipeline = Pipeline::new("Canvas")?;
+        // Window and Canvas elem setup
+        let window = window().expect("No window found");
+        let viewport = Vec2::new(0.0, 0.0);
+        let position = Vec2::new(0.0, 0.0);
+        let canvas = window
+            .document()
+            .expect("Unable to get document")
+            .get_element_by_id("Canvas")
+            .expect("Unable to find Canvas")
+            .dyn_into::<HtmlCanvasElement>()?;
+
+        // Rendering pipeline setup
+        let mut pipeline = Pipeline::new(canvas)?;
         const FRAG: &str = shader_src!("grid.frag");
         const VERT: &str = shader_src!("grid.vert");
         pipeline.add_shaders(FRAG, VERT)?;
-        Ok(Self { pipeline, tx: None })
-    }
-    /// Starts async render loop.
-    pub fn start_render(&mut self) {
-        let (tx, rx) = mpsc::channel::<()>();
-        self.tx = Some(tx);
-        spawn_local(async move {
-            console_info!("Canvas render thread started");
-            loop {
-                if rx.try_recv().is_ok() {
-                    break;
-                }
-            }
-            console_info!("Canvas render thread terminated");
-        });
-    }
-}
 
-/// Cleans up the rendering thread on Canvas deletion
-impl Drop for Canvas {
-    fn drop(&mut self) {
-        if let Some(tx) = self.tx.take() {
-            let _ = tx.send(());
-        }
+        // Set width
+        let mut out = Self {
+            position,
+            pipeline,
+            viewport,
+            window,
+        };
+        // Set width
+        out.handle_resize()?;
+        Ok(out)
+    }
+
+    /// Called by the JS
+    pub fn handle_resize(&mut self) -> WasmResult<()> {
+        let width = self.window.inner_width()?.as_f64().unwrap() as f32;
+        let height = self.window.inner_height()?.as_f64().unwrap() as f32;
+        self.viewport.update(width, height);
+        self.pipeline.resize(Vec2::new(height, width));
+        self.render();
+        Ok(())
+    }
+
+    /// Called by JS's request animation frame render loop
+    pub fn render(&self) {
+        console_info!("Rendering");
+        self.pipeline.render();
     }
 }
