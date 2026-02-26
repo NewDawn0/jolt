@@ -1,13 +1,17 @@
+//! Canvas management - WebGL2 init and render loop.
+
 use std::sync::mpsc::{self, Sender};
 
 use crate::{console_info, render::webgl2::Pipeline, types::WasmResult};
 use wasm_bindgen_futures::spawn_local;
 
+/// WebGL2 canvas wrapper.
 pub struct Canvas {
     pipeline: Pipeline,
     tx: Option<Sender<()>>,
 }
 
+/// Embeds shader source at compile time.
 macro_rules! shader_src {
     ($file:expr) => {
         include_str!(concat!("shader/", $file))
@@ -15,6 +19,7 @@ macro_rules! shader_src {
 }
 
 impl Canvas {
+    /// Creates new canvas
     pub fn new() -> WasmResult<Self> {
         let mut pipeline = Pipeline::new("Canvas")?;
         const FRAG: &str = shader_src!("grid.frag");
@@ -22,6 +27,7 @@ impl Canvas {
         pipeline.add_shaders(FRAG, VERT)?;
         Ok(Self { pipeline, tx: None })
     }
+    /// Starts async render loop.
     pub fn start_render(&mut self) {
         let (tx, rx) = mpsc::channel::<()>();
         self.tx = Some(tx);
@@ -37,6 +43,7 @@ impl Canvas {
     }
 }
 
+/// Cleans up the rendering thread on Canvas deletion
 impl Drop for Canvas {
     fn drop(&mut self) {
         if let Some(tx) = self.tx.take() {
