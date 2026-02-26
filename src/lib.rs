@@ -1,10 +1,35 @@
-mod app;
+mod canvas;
 mod render;
 mod types;
-use crate::{app::App, types::WasmResult};
+use crate::{canvas::Canvas, types::WasmResult};
+use wasm_bindgen::prelude::*;
 
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+    #[wasm_bindgen(js_namespace = console)]
+    fn error(s: &str);
+    #[wasm_bindgen(js_namespace = console)]
+    fn info(s: &str);
+}
+#[macro_export]
+macro_rules! console_log {
+    ($($t:tt)*) => ($crate::log(&format_args!($($t)*).to_string()))
+}
+#[macro_export]
+macro_rules! console_error {
+    ($($t:tt)*) => ($crate::error(&format_args!($($t)*).to_string()))
+}
+#[macro_export]
+macro_rules! console_info {
+    ($($t:tt)*) => ($crate::info(&format_args!($($t)*).to_string()))
+}
+
+#[wasm_bindgen(start)]
 pub fn start() -> WasmResult<()> {
     console_error_panic_hook::set_once();
-    App::new()?;
+    let mut canvas = Canvas::new()?;
+    canvas.start_render();
     Ok(())
 }
