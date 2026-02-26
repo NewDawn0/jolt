@@ -1,0 +1,66 @@
+# == Building ==
+[tasks.build]
+description = "Build wasm and move artifacts"
+dependencies = ["clean-files", "build-rust"]
+command = "mv"
+args = ["pkg", "public"]
+
+[tasks.build-rust]
+private = true
+command = "wasm-pack"
+args = ["build", "--target", "web"]
+install_crate = "wasm-pack"
+
+# == Cleanup ==
+[tasks.clean]
+description = "Clean build and dist artifacts"
+# @NOTE: run_task cannot be used here to clean in parallel as cargo make will thow an error
+dependencies = ["clean-files"]
+
+[tasks.clean-files]
+private = true
+script = ["rm -rf pkg public/pkg"]
+
+# == Documentation ==
+[tasks.doc]
+description = "Build and open the documentation"
+args = ["doc", "--open"]
+command = "cargo"
+
+# == Formatting ==
+[tasks.format]
+description = "Format the project"
+args = ["fmt", "--", "--emit=files"]
+command = "cargo"
+install_crate = "rustfmt"
+
+# == Watching ==
+[tasks.watch]
+description = "Watch the build and serve"
+# Use a single run_task object to trigger both in parallel
+run_task = { name = ["serve", "watch-build"], parallel = true }
+
+[tasks.watch-build]
+description = "Watch source files and trigger build"
+install_crate = "cargo-watch"
+command = "cargo"
+# Fixed -w syntax and ensured public/pkg is ignored to prevent loops
+args = [
+  "watch",
+  "-w",
+  "src",
+  "-w",
+  "public",
+  "-i",
+  "public/pkg",
+  "-x",
+  "make build",
+]
+
+# == Serving ==
+[tasks.serve]
+description = "Serve the public folder"
+install_crate = "static-web-server"
+command = "static-web-server"
+# Use --root for the directory and --port for the local listener
+args = ["--root", "public", "--port", "8080"]
