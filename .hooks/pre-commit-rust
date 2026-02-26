@@ -1,0 +1,23 @@
+#!/bin/sh
+
+echo ">> Running Rust pre-commit hooks"
+
+echo "[1/3]: Formatting..."
+cargo make format
+if [ $? -ne 0 ]; then
+    echo "❌ Formatting failed. Please fix issues before committing."
+    exit 1
+fi
+
+echo "[2/3]: Testing..."
+cargo make test
+if [ $? -ne 0 ]; then
+    echo "❌ Tests failed. Commit aborted."
+    exit 1
+fi
+
+echo "[3/3]: Cleaning..."
+cargo make clean
+
+echo ">> Finished Rust pre-commit hooks"
+exit 0

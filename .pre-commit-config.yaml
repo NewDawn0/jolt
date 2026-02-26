@@ -1,0 +1,17 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+
+-   repo: local
+    hooks:
+    -   id: rust-checks
+        name: Rust Checks (Format, Test, Clean)
+        entry: .hooks/pre-commit-rust
+        files: \.rs$
+        language: script
+        pass_filenames: false
