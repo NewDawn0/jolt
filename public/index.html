@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jolt</title>
+</head>
+
+<body>
+  <!-- Setup -->
+  <!-- Styling -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Js required for the wasm loader -->
+  <noscript>
+    <h1>Javascript is required</h1>
+  </noscript>
+  <!-- Load the wasm main -->
+  <script type="module">
+    import init from './pkg/jolt.js';
+    await init().catch(console.error);
+  </script>
+  <!-- Main components -->
+  <canvas id="Canvas"></canvas>
+  <!-- TEMP: Testing components -->
+  <div id="testOverlay">
+    FPS: <span id="overlay-fps">0</span><br>
+    Pos: <span id="overlay-pos">0, 0</span><br>
+    Zoom: <span id="overlay-zoom">1.0</span>
+  </div>
+</body>
+
+</html>
