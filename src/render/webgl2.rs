@@ -30,6 +30,37 @@ impl Pipeline {
             .ok_or("Failed to create VAO for rendering")?;
         Ok(Self { ctx, program, vao })
     }
+    pub fn add_shaders(&mut self, frag_src: &str, vert_src: &str) -> WasmResult<()> {
+        let frag = self.compile_shader(frag_src, GL::FRAGMENT_SHADER)?;
+        let vert = self.compile_shader(vert_src, GL::VERTEX_SHADER)?;
+        self.ctx.attach_shader(&self.program, &frag);
+        self.ctx.attach_shader(&self.program, &vert);
+        self.ctx.link_program(&self.program);
+        // Check for linker errors
+        if !self
+            .ctx
+            .get_program_parameter(&self.program, GL::LINK_STATUS)
+            .as_bool()
+            .unwrap_or(false)
+        {
+            return Err(self
+                .ctx
+                .get_program_info_log(&self.program)
+                .unwrap_or_default()
+                .into());
+        }
+        // Configure the Vertex Array Object (VAO)
+        self.ctx.bind_vertex_array(Some(&self.vao));
+        // self.ctx.bind_buffer(GL::ARRAY_BUFFER, Some(&self.vbo));
+        // Define attribute 0: (Location, Size, Type, Normalized, Stride, Offset)
+        self.ctx.enable_vertex_attrib_array(0);
+        self.ctx
+            .vertex_attrib_pointer_with_i32(0, 2, GL::FLOAT, false, 0, 0);
+        // Unbind to prevent accidental state changes elsewhere
+        self.ctx.bind_vertex_array(None);
+        self.ctx.use_program(Some(&self.program));
+        Ok(())
+    }
     fn compile_shader(&self, src: &str, shader_t: u32) -> WasmResult<GLShader> {
         let shader = self
             .ctx
