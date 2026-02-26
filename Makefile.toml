@@ -57,7 +57,7 @@ args = [
 # Serving
 [tasks.serve]
 description = "Serve public folder"
-# @NOTE: Rust webservers I've tried have a weird caching issue where by old versions are served
+# @BUG: Rust webservers I've tried have a weird caching issue where by old versions are served
 # Ive tried static-web-server & cargo-serve
 command = "npx"
 args = ["serve", "public"]
