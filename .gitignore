@@ -1,4 +1,2 @@
-/pkg
-/public/pkg
-/target
-macros
+old/
+target/

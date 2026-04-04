@@ -11,47 +11,16 @@
   <!-- Setup -->
   <!-- Styling -->
   <link rel="stylesheet" href="style.css">
+  <!-- Main components -->
+  <canvas id="Canvas"></canvas>
+  <!-- TEMP: Testing components -->
   <!-- Js required for the wasm loader -->
   <noscript>
     <h1>Javascript is required</h1>
   </noscript>
   <!-- Load the wasm main -->
-  <script type="module">
-    import init, {Canvas} from './pkg/jolt.js';
-    const setup = async () => {
-      await init().catch(console.error);
-      const ctx = {
-        canvas: new Canvas(),
-        fpsEl: document.getElementById("overlay-fps"),
-        lastTime: performance.now(),
-      }
-      // Add handlers
-      window.addEventListener('resize', () => {
-        ctx.canvas.handle_resize();
-      });
-      // Start rendering
-      window.requestAnimationFrame(() => renderLoop(ctx));
-    }
-
-    const renderLoop = (ctx) => {
-      const {canvas, fpsEl, lastTime} = ctx;
-      const now = performance.now();
-      const deltaTime = now - lastTime;
-      ctx.lastTime = now;
-      const fps = deltaTime > 0 ? 1000 / deltaTime : 0;
-      fpsEl.innerText = Math.round(fps);
-      window.requestAnimationFrame(() => renderLoop(ctx));
-    }
-    await setup();
+  <script type="module"> <!-- from file src -->
   </script>
-  <!-- Main components -->
-  <canvas id="Canvas"></canvas>
-  <!-- TEMP: Testing components -->
-  <div id="testOverlay">
-    FPS: <span id="overlay-fps">0</span><br>
-    Pos: <span id="overlay-pos">0, 0</span><br>
-    Zoom: <span id="overlay-zoom">1.0</span>
-  </div>
 </body>
 
 </html>
